@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daftar Bawaan Haji</title>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #F7F4EE;
+    --surface: #FFFFFF;
+    --surface2: #F0EDE6;
+    --border: #E0DAD0;
+    --text: #1A1714;
+    --text-muted: #7A7269;
+    --green: #2D6A4F;
+    --green-bg: #EAF4EE;
+    --green-border: #B7DFC8;
+    --amber: #92400E;
+    --amber-bg: #FEF3C7;
+    --amber-border: #FCD34D;
+    --red: #991B1B;
+    --red-bg: #FEF2F2;
+    --red-border: #FCA5A5;
+    --accent: #C8975A;
+    --radius: 10px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.07), 0 1px 2px rgba(0,0,0,0.04);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    font-size: 14px;
+    line-height: 1.6;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--text);
+    color: #fff;
+    padding: 2.5rem 2rem 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .header-inner { max-width: 800px; margin: 0 auto; }
+  .header-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  header h1 {
+    font-family: 'Instrument Serif', serif;
+    font-size: clamp(1.6rem, 4vw, 2.2rem);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+  header h1 span { color: var(--accent); font-style: italic; }
+  header p { color: rgba(255,255,255,0.55); font-size: 13px; margin-top: 4px; font-weight: 300; }
+
+  /* progress ring */
+  .progress-wrap { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+  .ring-container { position: relative; width: 56px; height: 56px; }
+  .ring-bg { fill: none; stroke: rgba(255,255,255,0.15); stroke-width: 4; }
+  .ring-fill { fill: none; stroke: var(--accent); stroke-width: 4; stroke-linecap: round;
+    transform: rotate(-90deg); transform-origin: 50% 50%;
+    transition: stroke-dashoffset 0.5s cubic-bezier(.4,0,.2,1); }
+  .ring-label { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; font-weight: 500; color: #fff; }
+  .progress-text { color: rgba(255,255,255,0.7); font-size: 12px; text-align: right; line-height: 1.4; }
+  .progress-text strong { display: block; font-size: 15px; color: #fff; font-weight: 500; }
+
+  /* ── STATS BAR ── */
+  .stats-bar { display: flex; gap: 0; margin-top: 1.25rem; background: rgba(255,255,255,0.08); border-radius: var(--radius); overflow: hidden; }
+  .stat { flex: 1; text-align: center; padding: 0.6rem 0.5rem; border-right: 1px solid rgba(255,255,255,0.1); }
+  .stat:last-child { border-right: none; }
+  .stat-n { font-size: 1.1rem; font-weight: 500; color: #fff; }
+  .stat-l { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 1px; }
+
+  /* ── MAIN CONTENT ── */
+  main { max-width: 800px; margin: 0 auto; padding: 1.5rem 1rem 3rem; }
+
+  /* ── SEARCH + CONTROLS ── */
+  .controls { display: flex; gap: 10px; margin-bottom: 1.25rem; flex-wrap: wrap; }
+  .search-wrap { flex: 1; min-width: 180px; position: relative; }
+  .search-wrap svg { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+  input[type=search] {
+    width: 100%; padding: 9px 12px 9px 36px;
+    border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text); font-family: inherit; font-size: 14px;
+    outline: none; transition: border-color .2s, box-shadow .2s;
+  }
+  input[type=search]:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(200,151,90,0.15); }
+  .ctrl-btn {
+    padding: 9px 14px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); color: var(--text-muted); font-family: inherit; font-size: 13px;
+    cursor: pointer; transition: all .15s; white-space: nowrap;
+  }
+  .ctrl-btn:hover { background: var(--surface2); color: var(--text); border-color: #ccc; }
+  .ctrl-btn.danger { color: var(--red); border-color: var(--red-border); }
+  .ctrl-btn.danger:hover { background: var(--red-bg); }
+
+  /* ── CATEGORY CARD ── */
+  .category {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    margin-bottom: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+    transition: box-shadow .2s;
+  }
+  .category:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.1); }
+
+  .cat-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 14px 16px; cursor: pointer;
+    user-select: none; transition: background .15s;
+  }
+  .cat-header:hover { background: var(--surface2); }
+
+  .cat-emoji { font-size: 20px; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center;
+    border-radius: 8px; background: var(--bg); flex-shrink: 0; }
+
+  .cat-info { flex: 1; }
+  .cat-title { font-size: 15px; font-weight: 500; }
+  .cat-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
+
+  .cat-right { display: flex; align-items: center; gap: 10px; }
+  .cat-count { font-size: 13px; color: var(--text-muted); }
+  .cat-bar { width: 64px; height: 5px; background: var(--bg); border-radius: 99px; overflow: hidden; }
+  .cat-bar-fill { height: 100%; background: var(--green); border-radius: 99px; transition: width .4s cubic-bezier(.4,0,.2,1); }
+  .chevron { color: var(--text-muted); font-size: 12px; transition: transform .25s; flex-shrink: 0; }
+  .chevron.open { transform: rotate(180deg); }
+
+  .add-cat-btn {
+    margin: 2px 16px 0 16px; padding: 0;
+    border: none; background: none; color: var(--accent);
+    font-size: 12px; font-family: inherit; cursor: pointer;
+    display: flex; align-items: center; gap: 4px;
+    opacity: 0; transition: opacity .15s; pointer-events: none;
+  }
+  .category:hover .add-cat-btn, .add-cat-btn:focus { opacity: 1; pointer-events: auto; }
+
+  /* ── ITEMS LIST ── */
+  .items-wrap { display: none; border-top: 1px solid var(--border); }
+  .items-wrap.open { display: block; }
+
+  .item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 11px 16px;
+    border-bottom: 1px solid var(--surface2);
+    transition: background .12s;
+    position: relative;
+  }
+  .item:last-child { border-bottom: none; }
+  .item:hover { background: #FAFAF8; }
+  .item.checked { background: #FAFDF9; }
+
+  /* checkbox */
+  .cb-box {
+    width: 20px; height: 20px; border-radius: 6px;
+    border: 1.5px solid #CCC; background: #fff;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; flex-shrink: 0; transition: all .15s;
+  }
+  .cb-box:hover { border-color: var(--green); }
+  .item.checked .cb-box { background: var(--green); border-color: var(--green); }
+  .cb-check { color: #fff; font-size: 11px; display: none; }
+  .item.checked .cb-check { display: block; }
+
+  /* item text */
+  .item-text-wrap { flex: 1; cursor: pointer; }
+  .item-label { font-size: 14px; color: var(--text); transition: color .15s; }
+  .item.checked .item-label { color: var(--text-muted); text-decoration: line-through; text-decoration-color: #bbb; }
+  .item-note { font-size: 12px; color: var(--text-muted); margin-top: 1px; font-style: italic; display: none; }
+  .item-note.visible { display: block; }
+
+  /* badges */
+  .badge { font-size: 11px; padding: 2px 8px; border-radius: 99px; font-weight: 500; flex-shrink: 0; }
+  .badge-penting { background: var(--amber-bg); color: var(--amber); border: 1px solid var(--amber-border); }
+  .badge-tips { background: var(--green-bg); color: var(--green); border: 1px solid var(--green-border); }
+
+  /* item actions */
+  .item-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .15s; }
+  .item:hover .item-actions { opacity: 1; }
+  .act-btn {
+    width: 26px; height: 26px; border-radius: 6px; border: none; background: none;
+    color: var(--text-muted); cursor: pointer; display: flex; align-items: center; justify-content: center;
+    font-size: 13px; transition: all .15s;
+  }
+  .act-btn:hover { background: var(--surface2); color: var(--text); }
+  .act-btn.del:hover { background: var(--red-bg); color: var(--red); }
+
+  /* ── ADD ITEM ROW ── */
+  .add-item-row {
+    display: flex; gap: 8px; padding: 10px 16px 12px;
+    border-top: 1px dashed var(--border);
+    background: var(--bg);
+  }
+  .add-input {
+    flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;
+    background: var(--surface); font-family: inherit; font-size: 13px; color: var(--text); outline: none;
+    transition: border-color .2s, box-shadow .2s;
+  }
+  .add-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(200,151,90,0.12); }
+  .add-submit {
+    padding: 8px 14px; border-radius: 8px; border: none;
+    background: var(--text); color: #fff; font-family: inherit; font-size: 13px;
+    cursor: pointer; transition: opacity .15s;
+  }
+  .add-submit:hover { opacity: 0.85; }
+
+  /* ── ADD CATEGORY ── */
+  .add-cat-row {
+    background: var(--surface); border: 1px dashed var(--border); border-radius: 12px;
+    padding: 14px 16px; display: flex; gap: 8px; align-items: center; margin-bottom: 12px;
+  }
+  .add-cat-row input { flex: 1; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: inherit; font-size: 14px; color: var(--text); background: var(--bg); outline: none; }
+  .add-cat-row input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(200,151,90,0.12); }
+
+  /* ── EDIT MODAL ── */
+  .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.45); z-index: 200;
+    display: flex; align-items: center; justify-content: center; padding: 1rem; display: none; }
+  .modal-overlay.open { display: flex; }
+  .modal { background: var(--surface); border-radius: 14px; padding: 1.5rem; width: 100%; max-width: 420px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2); }
+  .modal h3 { font-size: 16px; font-weight: 500; margin-bottom: 1rem; }
+  .modal label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; margin-top: 12px; }
+  .modal input, .modal select, .modal textarea {
+    width: 100%; padding: 9px 12px; border: 1px solid var(--border); border-radius: 8px;
+    font-family: inherit; font-size: 14px; color: var(--text); background: var(--bg); outline: none;
+  }
+  .modal input:focus, .modal select:focus { border-color: var(--accent); }
+  .modal textarea { resize: vertical; min-height: 60px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 1.25rem; justify-content: flex-end; }
+  .btn-cancel { padding: 9px 18px; border: 1px solid var(--border); border-radius: 8px; background: none;
+    font-family: inherit; font-size: 14px; cursor: pointer; }
+  .btn-save { padding: 9px 18px; border: none; border-radius: 8px; background: var(--text); color: #fff;
+    font-family: inherit; font-size: 14px; cursor: pointer; }
+  .btn-save:hover { opacity: 0.85; }
+
+  /* ── EMPTY STATE ── */
+  .empty { text-align: center; padding: 2rem; color: var(--text-muted); font-size: 13px; }
+  .hidden { display: none !important; }
+
+  /* ── TIPS ── */
+  .tips-box { background: var(--amber-bg); border: 1px solid var(--amber-border); border-radius: 10px;
+    padding: 12px 16px; margin-bottom: 1.25rem; font-size: 13px; color: var(--amber);
+    display: flex; gap: 10px; align-items: flex-start; }
+  .tips-box strong { font-weight: 500; }
+
+  @media (max-width: 480px) {
+    header { padding: 1.5rem 1rem 1rem; }
+    .controls { gap: 8px; }
+    .ctrl-btn { font-size: 12px; padding: 8px 10px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-inner">
+    <div class="header-top">
+      <div>
+        <h1>Daftar Bawaan <span>Haji</span></h1>
+        <p>Checklist persiapan perjalanan ibadah haji — bisa diedit langsung</p>
+      </div>
+      <div class="progress-wrap">
+        <div class="ring-container">
+          <svg width="56" height="56" viewBox="0 0 56 56">
+            <circle class="ring-bg" cx="28" cy="28" r="22"/>
+            <circle class="ring-fill" id="ringFill" cx="28" cy="28" r="22" stroke-dasharray="138.2" stroke-dashoffset="138.2"/>
+          </svg>
+          <div class="ring-label" id="ringPct">0%</div>
+        </div>
+        <div class="progress-text">
+          <strong id="headerChecked">0</strong>
+          <span>dari <span id="headerTotal">0</span> item<br>sudah dipack</span>
+        </div>
+      </div>
+    </div>
+    <div class="stats-bar" id="statsBar"></div>
+  </div>
+</header>
+
+<main>
+  <div class="tips-box">
+    <span>💡</span>
+    <div><strong>Tips ruang koper:</strong> Sisakan 20–30% ruang kosong dari awal, atau bawa 1 tas lipat tambahan untuk oleh-oleh pulang. Pakaian bisa dikurangi karena laundry di sana murah & mudah.</div>
+  </div>
+
+  <div class="controls">
+    <div class="search-wrap">
+      <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input type="search" id="searchInput" placeholder="Cari barang..." oninput="filterItems(this.value)">
+    </div>
+    <button class="ctrl-btn" onclick="toggleAll(true)">Buka semua</button>
+    <button class="ctrl-btn" onclick="toggleAll(false)">Tutup semua</button>
+    <button class="ctrl-btn danger" onclick="resetChecked()">Reset centang</button>
+  </div>
+
+  <div id="categoriesContainer"></div>
+
+  <div style="margin-top: 10px;">
+    <div class="add-cat-row" id="addCatRow" style="display:none">
+      <span>📦</span>
+      <input type="text" id="newCatName" placeholder="Nama kategori baru..." onkeydown="if(event.key==='Enter')addCategory()">
+      <button class="add-submit" onclick="addCategory()">Tambah</button>
+      <button class="ctrl-btn" onclick="document.getElementById('addCatRow').style.display='none'">✕</button>
+    </div>
+    <button class="ctrl-btn" onclick="document.getElementById('addCatRow').style.display='flex';document.getElementById('newCatName').focus()" style="width:100%;justify-content:center;display:flex;gap:6px;font-size:13px;">
+      + Tambah kategori baru
+    </button>
+  </div>
+</main>
+
+<!-- Edit Modal -->
+<div class="modal-overlay" id="editModal" onclick="closeModal(event)">
+  <div class="modal">
+    <h3>Edit barang</h3>
+    <label>Nama barang</label>
+    <input type="text" id="editLabel" placeholder="Nama barang">
+    <label>Catatan (opsional)</label>
+    <textarea id="editNote" placeholder="Misal: beli ukuran travel size"></textarea>
+    <label>Label</label>
+    <select id="editBadge">
+      <option value="">— Tidak ada —</option>
+      <option value="penting">⚠ Penting</option>
+      <option value="tips">✓ Tips</option>
+    </select>
+    <div class="modal-actions">
+      <button class="btn-cancel" onclick="closeModal()">Batal</button>
+      <button class="btn-save" onclick="saveEdit()">Simpan</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ═══════════════════════════════════════════
+//  DATA — edit langsung di sini jika mau
+// ═══════════════════════════════════════════
+let categories = [
+  {
+    id: 'ibadah', emoji: '🕋', title: 'Perlengkapan ibadah',
+    items: [
+      { id: 'i1',  label: 'Kain ihram (2 set)', badge: 'penting', note: 'Pilih bahan yang ringan dan menyerap keringat' },
+      { id: 'i2',  label: 'Sabuk ihram (ikat pinggang lebar)', badge: 'penting', note: '' },
+      { id: 'i3',  label: 'Sajadah travel (tipis & ringan)', badge: 'tips', note: 'Cari yang bisa dilipat kecil, ada kantong sendiri' },
+      { id: 'i4',  label: 'Al-Qur\'an kecil / pocket Quran', badge: '', note: '' },
+      { id: 'i5',  label: 'Buku doa & panduan manasik', badge: '', note: '' },
+      { id: 'i6',  label: 'Tasbih / tasbih digital', badge: '', note: '' },
+      { id: 'i7',  label: 'Sandal jepit yang mudah dilepas', badge: 'penting', note: 'Pilih yang tidak mudah putus, pakai tali pengaman' },
+    ]
+  },
+  {
+    id: 'pakaian', emoji: '👔', title: 'Pakaian',
+    items: [
+      { id: 'p1',  label: 'Baju lengan panjang (5–6 stel)', badge: 'tips', note: 'Pilih bahan polyester / katun tipis yang cepat kering' },
+      { id: 'p2',  label: 'Kaos dalam / singlet (5–6 pcs)', badge: '', note: '' },
+      { id: 'p3',  label: 'Celana panjang longgar (3–4 pcs)', badge: '', note: '' },
+      { id: 'p4',  label: 'Celana dalam (7 pcs)', badge: '', note: '' },
+      { id: 'p5',  label: 'Kaos kaki (5–6 pasang)', badge: '', note: '' },
+      { id: 'p6',  label: 'Pakaian tidur / sarung (2 stel)', badge: '', note: '' },
+      { id: 'p7',  label: 'Jaket tipis / hoodie untuk AC', badge: '', note: 'Hotel & bus sering sangat dingin AC-nya' },
+      { id: 'p8',  label: 'Topi atau peci anti panas', badge: 'penting', note: 'Suhu Mekah bisa 40°C+, wajib ada penutup kepala' },
+      { id: 'p9',  label: 'Ikat pinggang', badge: '', note: '' },
+    ]
+  },
+  {
+    id: 'mandi', emoji: '🧴', title: 'Mandi & perawatan diri',
+    items: [
+      { id: 'm1',  label: 'Sabun mandi batang (2–3 biji)', badge: 'tips', note: 'Lebih hemat tempat & ringan dibanding botol' },
+      { id: 'm2',  label: 'Sampo (travel size atau sachet)', badge: '', note: '' },
+      { id: 'm3',  label: 'Pasta gigi + sikat gigi', badge: '', note: '' },
+      { id: 'm4',  label: 'Deodoran', badge: 'penting', note: '' },
+      { id: 'm5',  label: 'Pelembap wajah & tubuh', badge: 'penting', note: 'Udara Arab Saudi sangat kering, kulit mudah pecah-pecah' },
+      { id: 'm6',  label: 'Sunscreen SPF 50+', badge: 'penting', note: 'Pakai ulang setiap 2–3 jam saat di luar ruangan' },
+      { id: 'm7',  label: 'Lip balm / pelembap bibir', badge: '', note: '' },
+      { id: 'm8',  label: 'Gunting kuku kecil', badge: '', note: '' },
+      { id: 'm9',  label: 'Cotton bud', badge: '', note: '' },
+      { id: 'm10', label: 'Silet / alat cukur', badge: '', note: '' },
+      { id: 'm11', label: 'Cermin kecil', badge: '', note: '' },
+      { id: 'm12', label: 'Sisir', badge: '', note: '' },
+      { id: 'm13', label: 'Tisu basah (banyak, beberapa pack)', badge: 'penting', note: '' },
+      { id: 'm14', label: 'Tisu kering', badge: '', note: '' },
+    ]
+  },
+  {
+    id: 'obat', emoji: '💊', title: 'Obat-obatan & kesehatan',
+    items: [
+      { id: 'o1',  label: 'Obat pribadi rutin (stok penuh)', badge: 'penting', note: 'Bawa lebih dari cukup, susah cari yang sama di sana' },
+      { id: 'o2',  label: 'Parasetamol / pereda nyeri', badge: '', note: '' },
+      { id: 'o3',  label: 'Obat diare (imodium / norit / loperamide)', badge: 'penting', note: '' },
+      { id: 'o4',  label: 'Obat maag / antasida', badge: '', note: '' },
+      { id: 'o5',  label: 'Vitamin C & multivitamin', badge: '', note: '' },
+      { id: 'o6',  label: 'Obat batuk & pilek', badge: '', note: '' },
+      { id: 'o7',  label: 'Obat alergi (antihistamin)', badge: '', note: '' },
+      { id: 'o8',  label: 'Plester luka & antiseptik (betadine sachet)', badge: '', note: '' },
+      { id: 'o9',  label: 'Obat tetes mata (anti kering)', badge: '', note: 'Mata sering kering karena AC & debu' },
+      { id: 'o10', label: 'Masker N95 atau masker medis', badge: 'penting', note: 'Kerumunan besar, debu, & cuaca ekstrem' },
+      { id: 'o11', label: 'Hand sanitizer (botol kecil)', badge: '', note: '' },
+      { id: 'o12', label: 'Termometer digital', badge: '', note: '' },
+    ]
+  },
+  {
+    id: 'elektronik', emoji: '🔌', title: 'Elektronik & gadget',
+    items: [
+      { id: 'e1',  label: 'Handphone + charger', badge: 'penting', note: '' },
+      { id: 'e2',  label: 'Powerbank kapasitas besar (20.000 mAh+)', badge: 'penting', note: 'Banyak berjalan jauh dari colokan, powerbank wajib' },
+      { id: 'e3',  label: 'Kabel data cadangan', badge: '', note: '' },
+      { id: 'e4',  label: 'Adaptor colokan universal', badge: 'tips', note: 'Arab Saudi pakai tipe G (3 kaki persegi)' },
+      { id: 'e5',  label: 'Stop kontak mini / multi colokan', badge: 'tips', note: 'Di kamar hotel colokan biasanya sedikit' },
+      { id: 'e6',  label: 'Earphone', badge: '', note: '' },
+      { id: 'e7',  label: 'Flash disk atau kartu memori cadangan', badge: '', note: '' },
+    ]
+  },
+  {
+    id: 'dokumen', emoji: '📄', title: 'Dokumen & keuangan',
+    items: [
+      { id: 'd1',  label: 'Paspor asli', badge: 'penting', note: '' },
+      { id: 'd2',  label: 'Fotokopi paspor (simpan terpisah)', badge: 'penting', note: 'Simpan di tas berbeda dari paspor asli' },
+      { id: 'd3',  label: 'Visa haji & dokumen resmi haji', badge: 'penting', note: '' },
+      { id: 'd4',  label: 'Fotokopi KTP', badge: '', note: '' },
+      { id: 'd5',  label: 'Foto paspor cadangan (10 lembar)', badge: 'penting', note: '' },
+      { id: 'd6',  label: 'Kartu BPJS / asuransi kesehatan', badge: '', note: '' },
+      { id: 'd7',  label: 'Uang Riyal (SAR) tunai secukupnya', badge: 'penting', note: 'Bawa untuk kebutuhan tak terduga & sedekah' },
+      { id: 'd8',  label: 'Kartu ATM / kartu kredit cadangan', badge: '', note: '' },
+      { id: 'd9',  label: 'Daftar nomor kontak penting (ditulis tangan)', badge: '', note: '' },
+    ]
+  },
+  {
+    id: 'penunjang', emoji: '🎒', title: 'Perlengkapan penunjang',
+    items: [
+      { id: 'u1',  label: 'Tas ransel kecil (tas harian)', badge: 'penting', note: 'Untuk bawa barang saat tawaf, sa\'i, dll' },
+      { id: 'u2',  label: 'Tas pinggang / money belt', badge: 'penting', note: 'Untuk simpan paspor & uang saat di luar' },
+      { id: 'u3',  label: 'Kantong plastik / ziplock berbagai ukuran', badge: 'tips', note: 'Serbaguna: pisahkan baju kotor, simpan dokumen, dll' },
+      { id: 'u4',  label: 'Gembok koper + gembok kecil cadangan', badge: '', note: '' },
+      { id: 'u5',  label: 'Payung lipat kecil atau jas hujan ponco', badge: '', note: '' },
+      { id: 'u6',  label: 'Botol minum / tumbler (600 ml+)', badge: 'penting', note: 'Minum minimal 2–3 liter per hari, air zam-zam gratis' },
+      { id: 'u7',  label: 'Snack dari rumah (kurma, biskuit, madu)', badge: 'tips', note: '' },
+      { id: 'u8',  label: 'Label nama di semua koper & tas', badge: 'penting', note: '' },
+      { id: 'u9',  label: 'Tas lipat (foldable bag) untuk oleh-oleh', badge: 'tips', note: 'Koper tambahan gratis untuk barang pulang' },
+      { id: 'u10', label: 'Spidol permanen untuk nulis label', badge: '', note: '' },
+    ]
+  },
+];
+
+// ═══════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════
+let checked = {};
+let editTarget = null; // { catIdx, itemIdx }
+let openCats = {};
+
+function saveState() {
+  try { localStorage.setItem('haji_v2', JSON.stringify({ checked, openCats })); } catch(e) {}
+}
+function loadState() {
+  try {
+    const d = JSON.parse(localStorage.getItem('haji_v2') || '{}');
+    checked = d.checked || {};
+    openCats = d.openCats || {};
+  } catch(e) { checked = {}; openCats = {}; }
+}
+
+// ═══════════════════════════════════════════
+//  RENDER
+// ═══════════════════════════════════════════
+function render(filter = '') {
+  const container = document.getElementById('categoriesContainer');
+  container.innerHTML = '';
+  const q = filter.toLowerCase().trim();
+
+  categories.forEach((cat, ci) => {
+    const filteredItems = q
+      ? cat.items.filter(it => it.label.toLowerCase().includes(q) || it.note.toLowerCase().includes(q))
+      : cat.items;
+
+    if (q && filteredItems.length === 0) return;
+
+    const isOpen = q ? true : (openCats[cat.id] !== false);
+    const doneCount = filteredItems.filter(it => checked[it.id]).length;
+    const pct = filteredItems.length ? Math.round(doneCount / filteredItems.length * 100) : 0;
+
+    const div = document.createElement('div');
+    div.className = 'category';
+    div.innerHTML = `
+      <div class="cat-header" onclick="toggleCat('${cat.id}',${ci})">
+        <div class="cat-emoji">${cat.emoji}</div>
+        <div class="cat-info">
+          <div class="cat-title">${cat.title}</div>
+          <div class="cat-sub">${doneCount} dari ${filteredItems.length} item selesai</div>
+        </div>
+        <div class="cat-right">
+          <div class="cat-bar"><div class="cat-bar-fill" style="width:${pct}%"></div></div>
+          <div class="cat-count">${pct}%</div>
+          <div class="chevron ${isOpen ? 'open' : ''}">▼</div>
+        </div>
+      </div>
+      <div class="items-wrap ${isOpen ? 'open' : ''}" id="items-${cat.id}">
+        ${filteredItems.map(it => renderItem(it, ci, cat.items.indexOf(it))).join('')}
+        <div class="add-item-row">
+          <input class="add-input" type="text" placeholder="+ Tambah barang ke kategori ini..."
+            id="newItem-${ci}"
+            onkeydown="if(event.key==='Enter')addItem(${ci})">
+          <button class="add-submit" onclick="addItem(${ci})">Tambah</button>
+        </div>
+      </div>
+      <button class="add-cat-btn" onclick="deleteCat(${ci},event)" title="Hapus kategori ini">🗑 Hapus kategori</button>
+    `;
+    container.appendChild(div);
+  });
+
+  updateStats();
+}
+
+function renderItem(item, ci, ii) {
+  const isDone = checked[item.id];
+  const badgeHtml = item.badge === 'penting'
+    ? '<span class="badge badge-penting">⚠ Penting</span>'
+    : item.badge === 'tips'
+    ? '<span class="badge badge-tips">💡 Tips</span>'
+    : '';
+  const noteHtml = item.note ? `<div class="item-note visible">${item.note}</div>` : '';
+  return `
+    <div class="item ${isDone ? 'checked' : ''}" id="item-${item.id}">
+      <div class="cb-box" onclick="toggleCheck('${item.id}')">
+        <span class="cb-check">✓</span>
+      </div>
+      <div class="item-text-wrap" onclick="toggleCheck('${item.id}')">
+        <div class="item-label">${item.label}</div>
+        ${noteHtml}
+      </div>
+      ${badgeHtml}
+      <div class="item-actions">
+        <button class="act-btn" onclick="openEdit(${ci},${ii})" title="Edit">✏</button>
+        <button class="act-btn del" onclick="deleteItem(${ci},${ii})" title="Hapus">✕</button>
+      </div>
+    </div>`;
+}
+
+// ═══════════════════════════════════════════
+//  INTERACTIONS
+// ═══════════════════════════════════════════
+function toggleCheck(id) {
+  checked[id] = !checked[id];
+  saveState();
+  const el = document.getElementById(`item-${id}`);
+  if (el) el.classList.toggle('checked', checked[id]);
+  updateStats();
+  // update category sub-line
+  render(document.getElementById('searchInput').value);
+}
+
+function toggleCat(catId, ci) {
+  openCats[catId] = openCats[catId] === false ? true : false;
+  saveState();
+  const wrap = document.getElementById(`items-${catId}`);
+  const header = wrap?.previousElementSibling;
+  if (wrap) wrap.classList.toggle('open', openCats[catId] !== false);
+  if (header) header.querySelector('.chevron')?.classList.toggle('open', openCats[catId] !== false);
+}
+
+function toggleAll(open) {
+  categories.forEach(cat => { openCats[cat.id] = open; });
+  saveState();
+  render(document.getElementById('searchInput').value);
+}
+
+function filterItems(q) { render(q); }
+
+function resetChecked() {
+  if (!confirm('Reset semua centang? Data packing akan kembali kosong.')) return;
+  checked = {};
+  saveState();
+  render(document.getElementById('searchInput').value);
+}
+
+// ═══════════════════════════════════════════
+//  ADD / DELETE ITEM
+// ═══════════════════════════════════════════
+let uid = Date.now();
+function addItem(ci) {
+  const input = document.getElementById(`newItem-${ci}`);
+  const val = input.value.trim();
+  if (!val) return;
+  categories[ci].items.push({ id: 'u' + (uid++), label: val, badge: '', note: '' });
+  input.value = '';
+  saveState();
+  render(document.getElementById('searchInput').value);
+}
+
+function deleteItem(ci, ii) {
+  const item = categories[ci].items[ii];
+  if (!confirm(`Hapus "${item.label}" dari daftar?`)) return;
+  delete checked[item.id];
+  categories[ci].items.splice(ii, 1);
+  saveState();
+  render(document.getElementById('searchInput').value);
+}
+
+// ═══════════════════════════════════════════
+//  ADD / DELETE CATEGORY
+// ═══════════════════════════════════════════
+function addCategory() {
+  const input = document.getElementById('newCatName');
+  const val = input.value.trim();
+  if (!val) return;
+  const id = 'cat_' + (uid++);
+  categories.push({ id, emoji: '📦', title: val, items: [] });
+  input.value = '';
+  document.getElementById('addCatRow').style.display = 'none';
+  openCats[id] = true;
+  saveState();
+  render();
+}
+
+function deleteCat(ci, e) {
+  e.stopPropagation();
+  const cat = categories[ci];
+  if (!confirm(`Hapus seluruh kategori "${cat.title}"?\nSemua ${cat.items.length} item di dalamnya juga akan terhapus.`)) return;
+  cat.items.forEach(it => delete checked[it.id]);
+  categories.splice(ci, 1);
+  saveState();
+  render();
+}
+
+// ═══════════════════════════════════════════
+//  EDIT MODAL
+// ═══════════════════════════════════════════
+function openEdit(ci, ii) {
+  editTarget = { ci, ii };
+  const item = categories[ci].items[ii];
+  document.getElementById('editLabel').value = item.label;
+  document.getElementById('editNote').value = item.note || '';
+  document.getElementById('editBadge').value = item.badge || '';
+  document.getElementById('editModal').classList.add('open');
+  document.getElementById('editLabel').focus();
+}
+
+function closeModal(e) {
+  if (e && e.target !== document.getElementById('editModal')) return;
+  document.getElementById('editModal').classList.remove('open');
+  editTarget = null;
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.getElementById('editModal').classList.remove('open'); });
+
+function saveEdit() {
+  if (!editTarget) return;
+  const { ci, ii } = editTarget;
+  categories[ci].items[ii].label = document.getElementById('editLabel').value.trim() || categories[ci].items[ii].label;
+  categories[ci].items[ii].note  = document.getElementById('editNote').value.trim();
+  categories[ci].items[ii].badge = document.getElementById('editBadge').value;
+  document.getElementById('editModal').classList.remove('open');
+  editTarget = null;
+  saveState();
+  render(document.getElementById('searchInput').value);
+}
+
+// ═══════════════════════════════════════════
+//  STATS
+// ═══════════════════════════════════════════
+function updateStats() {
+  let total = 0, done = 0;
+  categories.forEach(cat => {
+    cat.items.forEach(it => {
+      total++;
+      if (checked[it.id]) done++;
+    });
+  });
+  const pct = total ? Math.round(done / total * 100) : 0;
+  const circ = 2 * Math.PI * 22;
+  document.getElementById('ringFill').style.strokeDashoffset = circ - (circ * pct / 100);
+  document.getElementById('ringPct').textContent = pct + '%';
+  document.getElementById('headerChecked').textContent = done;
+  document.getElementById('headerTotal').textContent = total;
+
+  // stats bar
+  const bar = document.getElementById('statsBar');
+  bar.innerHTML = categories.map(cat => {
+    const d = cat.items.filter(it => checked[it.id]).length;
+    const t = cat.items.length;
+    const p = t ? Math.round(d/t*100) : 0;
+    return `<div class="stat"><div class="stat-n">${p}%</div><div class="stat-l">${cat.emoji} ${cat.title.split(' ')[0]}</div></div>`;
+  }).join('');
+}
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+loadState();
+render();
+</script>
+</body>
+</html>
